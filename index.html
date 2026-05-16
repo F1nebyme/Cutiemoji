@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⋅˚₊‧୨cutie emoji୧‧₊˚</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        @import url("https://font.emtech.cc/css/jfOpenHuninn");
+        @import url("https://font.emtech.cc/css/LXGWWenKaiTC");
+        @import url("https://font.emtech.cc/css/SmileySans");
+        @import url("https://font.emtech.cc/css/MantouSans");
+        @import url("https://font.emtech.cc/css/LXGWMarkerGothic");
+        @import url("https://font.emtech.cc/css/LXGWHeartSerif");
+        @import url("https://font.emtech.cc/css/ZhudouSans");
+        @import url("https://font.emtech.cc/css/Iansui");
+        @import url("https://font.emtech.cc/css/GenYoGothicTC");
+        @import url("https://font.emtech.cc/css/GlowSansSC");
+        @import url("https://font.emtech.cc/css/UnboundedSans");
+        @import url("https://font.emtech.cc/css/MuzaiPixel");
+        @import url("https://font.emtech.cc/css/BoutiqueBitmap9x9CircleDot");
+        @import url("https://font.emtech.cc/css/BoutiqueBitmap9x9SquareDot");
+        @import url("https://font.emtech.cc/css/ChillRoundGothic");
+        @import url("https://font.emtech.cc/css/GlowSansJPCom");
+        @import url("https://font.emtech.cc/css/CEFFontsCJKMono");
+        @import url("https://font.emtech.cc/css/XiaoLai");
+        @import url("https://font.emtech.cc/css/ChillBitmap16px");
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>⋅˚₊‧ cutie emoji ‧₊˚ <span class="logo">ο(=·ω＜=)☆</span></h1>
+            <nav>
+                <button class="nav-btn active" data-tab="kaomoji">Emoji</button>
+                <button class="nav-btn" data-tab="editor">Picture</button>
+            </nav>
+        </header>
+
+        <!-- 颜文字页面 -->
+        <section id="kaomoji-section" class="tab-content active">
+            <div class="kaomoji-controls">
+                <button class="add-toggle-btn" id="btn-toggle-add">＋ 添加</button>
+            </div>
+
+            <div class="manual-add-box hidden" id="manual-add-box">
+                <div class="manual-add-row">
+                    <input type="text" id="manual-kaomoji-input" placeholder="输入颜文字，如：ᓚᘏᗢ" />
+                    <button class="manual-add-btn" id="btn-manual-add">＋ 添加单个</button>
+                </div>
+                <div class="manual-add-row">
+                    <textarea id="manual-batch-input" placeholder="批量添加：每行一个颜文字&#10;^•ω<^&#10;(萌´Д`萌)&#10;(￣▽ ￣)" rows="5"></textarea>
+                    <button class="manual-add-btn batch-btn" id="btn-batch-add">＋ 批量添加</button>
+                </div>
+                <div class="manual-add-category-row">
+                    <label class="category-label">添加到：</label>
+                    <select id="manual-category-select">
+                        <option value="favorites">我的收藏</option>
+                        <option value="happy">开心</option>
+                        <option value="cute">可爱</option>
+                        <option value="sad">伤心</option>
+                        <option value="other">其它</option>
+                        <option value="meow">喵</option>
+                        
+                        <option value="deco">deco</option>
+                        <option value="animal">动物</option>
+                        <option value="star">★</option>
+                        <option value="heart">♡</option>
+			<option value="korean">韩系</option>
+                        <option value="good">棒</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="category-tabs">
+                <button class="cat-manage-btn" id="btn-cat-manage">标签管理</button>
+                <button class="cat-btn active" data-category="favorites">我的收藏</button>
+                <button class="cat-btn" data-category="happy">开心</button>
+                <button class="cat-btn" data-category="cute">可爱</button>
+                <button class="cat-btn" data-category="sad">伤心</button>
+                <button class="cat-btn" data-category="other">其它</button>
+                <button class="cat-btn" data-category="meow">喵</button>
+                
+                <button class="cat-btn" data-category="deco">deco</button>
+                <button class="cat-btn" data-category="animal">动物</button>
+                <button class="cat-btn" data-category="star">★</button>
+                <button class="cat-btn" data-category="heart">♡</button>
+                <button class="cat-btn" data-category="korean">韩系</button>
+                <button class="cat-btn" data-category="good">棒</button>
+
+            </div>
+
+            <!-- 标签组管理弹窗 -->
+            <div id="cat-manage-modal" class="modal hidden">
+                <div class="modal-content cat-manage-modal-content">
+                    <h3>标签管理</h3>
+                    
+                    <!-- 新建标签 -->
+                    <div class="manage-section">
+                        <h4>新建标签</h4>
+                        <div class="new-group-row">
+                            <input type="text" id="new-group-name" placeholder="输入自定义标签名" maxlength="10">
+                            <button class="btn-create-circle" id="btn-create-group">创建</button>
+                        </div>
+                    </div>
+
+                    <!-- 标签列表 -->
+                    <div class="manage-section">
+                        <h4>标签列表（拖动排序）</h4>
+                        <div class="group-list" id="group-list">
+                            <!-- 动态生成 -->
+                        </div>
+                        <p class="manage-hint">提示：系统标签不能删除</p>
+                    </div>
+
+                    <div class="modal-actions">
+                        <button class="btn-cancel">关闭</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="kaomoji-grid" class="kaomoji-grid"></div>
+        </section>
+
+        <!-- P图工具页面 -->
+        <section id="editor-section" class="tab-content">
+            <div class="editor-container editor-new-layout">
+                <div class="editor-main-area">
+                    <div id="canvas-container" class="canvas-container">
+                        <div class="upload-placeholder" id="upload-placeholder">
+                            <div class="upload-dashed-box" onclick="document.getElementById('image-upload').click()">
+                                <span class="upload-icon">📷</span>
+                                <p>上传图片</p>
+                            </div>
+                        </div>
+                        <input type="file" id="image-upload" accept="image/*" hidden>
+                        <div class="canvas-float-controls" id="element-edit-group" style="display: none;">
+                            <div class="float-control">
+                                <label>缩放 <span id="scale-value">100%</span></label>
+                                <input type="range" id="element-scale" min="10" max="300" value="100">
+                            </div>
+                            <div class="float-control">
+                                <label>旋转 <span id="rotate-value">0°</span></label>
+                                <input type="range" id="element-rotate" min="-180" max="180" value="0">
+                            </div>
+                            <div class="float-control">
+                                <label>横向拉伸 <span id="stretch-x-value">100%</span></label>
+                                <input type="range" id="element-stretch-x" min="10" max="300" value="100">
+                            </div>
+                            <div class="float-control">
+                                <label>纵向拉伸 <span id="stretch-y-value">100%</span></label>
+                                <input type="range" id="element-stretch-y" min="10" max="300" value="100">
+                            </div>
+                            <div class="float-control" id="weight-control" style="display: none;">
+                                <label>粗细 <span id="element-weight-value">400</span></label>
+                                <input type="range" id="element-weight-slider" min="100" max="900" value="400" step="100">
+                            </div>
+                            <button class="toolbar-btn" id="btn-copy-element" title="复制">📋</button>
+                            <button class="toolbar-btn delete-btn" id="btn-delete-element" title="删除">🗑️</button>
+                        </div>
+                    </div>
+
+                    <div class="editor-bottom-tools">
+                        <button class="tool-icon-btn" id="btn-add-text" title="文本">
+                            <span class="tool-icon">Aa</span>
+                            <span class="tool-label">文本</span>
+                        </button>
+                        <button class="tool-icon-btn" id="btn-add-kaomoji" title="Emoji">
+                            <span class="tool-icon">😊</span>
+                            <span class="tool-label">Emoji</span>
+                        </button>
+                        <button class="tool-icon-btn" id="btn-rotate-right" title="旋转">
+                            <span class="tool-icon">↻</span>
+                            <span class="tool-label">旋转</span>
+                        </button>
+                        <button class="tool-icon-btn" id="btn-crop" title="裁剪">
+                            <span class="tool-icon">✂️</span>
+                            <span class="tool-label">裁剪</span>
+                        </button>
+                        <button class="tool-icon-btn" id="btn-pip" title="画中画">
+                            <span class="tool-icon">🖼️</span>
+                            <span class="tool-label">画中画</span>
+                        </button>
+                    </div>
+                    <!-- 裁剪工具栏 -->
+                    <div class="crop-toolbar" id="crop-toolbar" style="display: none;">
+                        <div class="crop-toolbar-left">
+                            <div class="crop-toolbar-row">
+                                <div class="crop-ratio-section">
+                                    <span class="crop-ratio-label">竖版</span>
+                                    <button class="crop-ratio-btn" data-ratio="2:3h">2:3</button>
+                                    <button class="crop-ratio-btn" data-ratio="3:4h">3:4</button>
+                                    <button class="crop-ratio-btn" data-ratio="4:5h">4:5</button>
+                                    <button class="crop-ratio-btn" data-ratio="9:16h">9:16</button>
+                                </div>
+                                <button class="crop-ratio-btn" id="btn-crop-cancel">取消</button>
+                            </div>
+                            <div class="crop-toolbar-row">
+                                <div class="crop-ratio-section">
+                                    <span class="crop-ratio-label">横版</span>
+                                    <button class="crop-ratio-btn" data-ratio="2:3v">2:3</button>
+                                    <button class="crop-ratio-btn" data-ratio="3:4v">3:4</button>
+                                    <button class="crop-ratio-btn" data-ratio="4:5v">4:5</button>
+                                    <button class="crop-ratio-btn" data-ratio="9:16v">9:16</button>
+                                </div>
+                                <button class="crop-ratio-btn primary" id="btn-crop-confirm">确定</button>
+                            </div>
+                            <div class="crop-toolbar-row">
+                                <div class="crop-ratio-section">
+                                    <button class="crop-ratio-btn" data-ratio="1:1">1:1</button>
+                                    <button class="crop-ratio-btn active" data-ratio="free">自由</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="editor-bottom-actions">
+                        <button class="bottom-action-btn" id="btn-change-image">🔄 换一张</button>
+                        <button class="bottom-action-btn primary" id="btn-download">💾 保存</button>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <!-- 文字编辑弹窗 -->
+            <div id="text-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3>添加文字</h3>
+                    <input type="text" id="text-input" placeholder="输入文字...">
+                    <div class="text-preview-area" id="text-preview-area">
+                        <span id="text-preview-content">预览文字</span>
+                    </div>
+                    <div class="text-options">
+                        <div class="font-select-area">
+                            <label>字体</label>
+                            <select id="text-font-select">
+                                <option value="default">系统默认</option>
+                                <option value="jfOpenHuninn" style="font-family:'jfOpenHuninn'">jf open 粉圓</option>
+                                <option value="LXGWWenKaiTC" style="font-family:'LXGWWenKaiTC'">霞鹜文楷</option>
+                                <option value="SmileySans" style="font-family:'SmileySans'">得意黑</option>
+                                <option value="MantouSans" style="font-family:'MantouSans'">饅頭黑體</option>
+                                <option value="LXGWMarkerGothic" style="font-family:'LXGWMarkerGothic'">霞鹜漫黑</option>
+                                <option value="LXGWHeartSerif" style="font-family:'LXGWHeartSerif'">霞鹜铭心宋</option>
+                                <option value="ZhudouSans" style="font-family:'ZhudouSans'">煮豆黑体</option>
+                                <option value="Iansui" style="font-family:'Iansui'">芫荽</option>
+                                <option value="GenYoGothicTC" style="font-family:'GenYoGothicTC'">源樣黑體</option>
+                                <option value="GlowSansSC" style="font-family:'GlowSansSC'">未来荧黑</option>
+                                <option value="GlowSansJPCom" style="font-family:'GlowSansJPCom'">未来荧黑 JP 较窄</option>
+                                <option value="UnboundedSans" style="font-family:'UnboundedSans'">无界黑</option>
+                                <option value="MuzaiPixel" style="font-family:'MuzaiPixel'">目哉像素</option>
+                                <option value="BoutiqueBitmap9x9CircleDot" style="font-family:'BoutiqueBitmap9x9CircleDot'">精品点阵体9x9圆形版</option>
+                                <option value="BoutiqueBitmap9x9SquareDot" style="font-family:'BoutiqueBitmap9x9SquareDot'">精品点阵体9x9方格版</option>
+                                <option value="ChillRoundGothic" style="font-family:'ChillRoundGothic'">寒蝉圆黑体</option>
+                                <option value="CEFFontsCJKMono" style="font-family:'CEFFontsCJKMono'">快去写作业 CJK Mono</option>
+                                <option value="XiaoLai" style="font-family:'XiaoLai'">小赖字体</option>
+                                <option value="ChillBitmap16px" style="font-family:'ChillBitmap16px'">寒蝉点阵体 16px</option>
+                            </select>
+                        </div>
+                        <label>颜色: <input type="color" id="text-color" value="#ffffff"></label>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-cancel">取消</button>
+                        <button class="btn-confirm" id="btn-confirm-text">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 颜文字选择弹窗 -->
+            <div id="kaomoji-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3>添加 Emoji</h3>
+                    <div class="emoji-input-area">
+                        <input type="text" id="kaomoji-input" placeholder="输入 Emoji 或颜文字">
+                        <div class="emoji-preview" id="emoji-preview"></div>
+                    </div>
+                    <div class="text-options">
+                        <label>颜色: <input type="color" id="kaomoji-text-color" value="#333333"></label>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-cancel">取消</button>
+                        <button class="btn-confirm" id="btn-confirm-kaomoji">添加</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 画中画弹窗 -->
+            <div id="pip-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3>🖼️ 画中画</h3>
+                    <div class="pip-upload-area" id="pip-upload-area">
+                        <div class="pip-upload-box" id="pip-upload-box">
+                            <span>📷</span>
+                            <p>点击添加图片</p>
+                        </div>
+                        <input type="file" id="pip-image-upload" accept="image/*" hidden>
+                    </div>
+                    <div class="pip-canvas-area" id="pip-canvas-area" style="display: none;">
+                        <canvas id="pip-canvas"></canvas>
+                    </div>
+                    <div class="pip-tools" id="pip-tools" style="display: none;">
+                        <button class="btn-pip-tool" id="btn-pip-crop" title="自由裁剪">✂️ 裁剪</button>
+                    </div>
+                    <div class="modal-actions">
+                        <button class="btn-cancel">取消</button>
+                        <button class="btn-confirm" id="btn-confirm-pip">确定</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 图片元素裁剪弹窗 -->
+            <div id="element-crop-modal" class="modal hidden">
+                <div class="modal-content">
+                    <h3>✂️ 裁剪图片</h3>
+                    <div id="element-crop-container" class="element-crop-container"></div>
+                    <div class="modal-actions">
+                        <button class="btn-cancel">取消</button>
+                        <button class="btn-confirm" id="btn-confirm-element-crop">确认裁剪</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 导入预览弹窗 -->
+            <div id="import-modal" class="modal hidden">
+                <div class="modal-content import-modal-content">
+                    <h3>📥 导入颜文字</h3>
+                    <div class="import-category">
+                        <label>选择目标分类：</label>
+                        <select id="import-category-select">
+                            
+                            <option value="happy">开心</option>
+                            <option value="cute">可爱</option>
+                            <option value="sad">伤心</option>
+                            <option value="other">其它</option>
+                            <option value="meow">喵</option>
+                            
+                            <option value="deco">deco</option>
+                            <option value="animal">动物</option>
+                            <option value="star">★</option>
+                            <option value="heart">♡</option>
+                            <option value="korean">韩系</option>
+                            <option value="good">棒</option>
+                        </select>
+                    </div>
+                    <div class="import-info">
+                        <p>支持格式：</p>
+                        <ul>
+                            <li><strong>TXT文件</strong>：每行一个颜文字</li>
+                            <li><strong>JSON文件</strong>：包含分类的颜文字数据</li>
+                        </ul>
+                    </div>
+                    <div id="import-preview" class="import-preview"></div>
+                    <div class="modal-actions">
+                        <button class="btn-cancel">取消</button>
+                        <button class="btn-confirm" id="btn-confirm-import">导入</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- 提示消息 -->
+    <div id="toast" class="toast hidden"></div>
+
+    <footer class="site-footer">
+        <p>© 2026 F1（⩌⩊⩌）. All rights reserved.</p>
+    </footer>
+
+    <script src="kaomoji-data.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>
