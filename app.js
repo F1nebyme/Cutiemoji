@@ -139,7 +139,7 @@ class KaomojiApp {
         }
     }
 
-        updateCategorySelect() {
+    updateCategorySelect() {
         const select = document.getElementById('manual-category-select');
         if (!select) return;
 
