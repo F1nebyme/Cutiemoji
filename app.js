@@ -160,7 +160,7 @@ class KaomojiApp {
                 select.appendChild(option);
             }
         }
-
+    }
     createNewCategory(name) {
         const id = 'custom_' + Date.now();
         kaomojiData[id] = {
