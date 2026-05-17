@@ -808,6 +808,8 @@ card.innerHTML = `
             saveImportedKaomoji(this.currentCategory);
             this.showToast('已删除');
         }
+        // 清除缓存，确保下次渲染时重新计算系统原有颜文字
+        this._systemItems = null;
         this.renderKaomojiGrid();
     }
 
