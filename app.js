@@ -666,37 +666,25 @@ class KaomojiApp {
             kaomojis = getKaomojiByCategory(this.currentCategory);
         }
 
-            // 获取系统原有颜文字（不含用户添加的）
-const systemOriginalItems = this.getSystemItems(this.currentCategory);
+        kaomojis.forEach(k => {
+            const card = document.createElement('div');
+            card.className = 'kaomoji-card';
 
-// 判断是否可删除：
-// 1. 自定义分类（custom_ 开头）：全部可删除
-// 2. 系统分类（非 custom_、非 favorites）：只有用户添加的（不在系统原始列表中）才可删除
-// 3. 收藏夹：不显示删除按钮
-let canDelete = false;
+            const canDelete = this.currentCategory === 'favorites' || this.currentCategory.startsWith('custom_');
 
-if (this.currentCategory.startsWith('custom_')) {
-    canDelete = true;  // 自定义分类全部可删除
-} else if (this.currentCategory !== 'favorites') {
-    // 系统分类：只有用户添加的才能删除
-    canDelete = !systemOriginalItems.includes(k.text);
-}
-// 收藏夹不显示删除按钮（通过取消收藏来移除）
+            card.innerHTML = `
+                <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${k.text}</div>
+                <div class="kaomoji-actions">
+                    <button class="action-btn copy-btn" title="复制">📋</button>
+                    <button class="action-btn favorite-btn ${this.isFavorited(k.text) ? 'favorited' : ''}" title="收藏">⭐</button>
+                    ${canDelete ? '<button class="action-btn delete-kaomoji-btn" title="删除">🗑️</button>' : ''}
+                </div>
+            `;
 
-// 构建按钮
-let buttonsHtml = `<button class="action-btn favorite-btn ${this.isFavorited(k.text) ? 'favorited' : ''}" title="收藏">⭐</button>`;
-if (canDelete) {
-    buttonsHtml += `<button class="action-btn delete-kaomoji-btn" title="删除">🗑️</button>`;
-}
-
-const singleBtnClass = !canDelete ? 'single-btn' : '';
-
-card.innerHTML = `
-    <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${this.escapeHtml(k.text)}</div>
-    <div class="kaomoji-actions ${singleBtnClass}">
-        ${buttonsHtml}
-    </div>
-`; 
+            card.querySelector('.copy-btn').addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.copyToClipboard(k.text);
+            });
 
             card.querySelector('.favorite-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -758,11 +746,7 @@ card.innerHTML = `
             this.showToast('已复制到剪贴板！');
         }
     }
-    escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-    }
+
     showToast(message) {
         const toast = document.getElementById('toast');
         toast.textContent = message;
@@ -788,15 +772,6 @@ card.innerHTML = `
         this.renderKaomojiGrid();
     }
 
-    getSystemItems(category) {
-    // 每次重新计算，不使用缓存
-    const imported = JSON.parse(localStorage.getItem('kaomoji-imported-data') || '{}');
-    const importedItems = imported[category] || [];
-    const allItems = kaomojiData[category] ? [...kaomojiData[category].items] : [];
-    // 系统原有颜文字 = 所有颜文字 - 用户导入的颜文字
-    return allItems.filter(item => !importedItems.includes(item));
-    }
-
     deleteKaomoji(text) {
         if (this.currentCategory === 'favorites') {
             this.favorites = this.favorites.filter(f => f !== text);
@@ -806,14 +781,7 @@ card.innerHTML = `
             kaomojiData[this.currentCategory].items = kaomojiData[this.currentCategory].items.filter(item => item !== text);
             this.saveCustomCategories();
             this.showToast('已删除');
-        } else if (kaomojiData[this.currentCategory]) {
-            // 用户添加到系统标签的颜文字
-            kaomojiData[this.currentCategory].items = kaomojiData[this.currentCategory].items.filter(item => item !== text);
-            saveImportedKaomoji(this.currentCategory);
-            this.showToast('已删除');
         }
-        // 清除缓存，确保下次渲染时重新计算系统原有颜文字
-        this._systemItems = null;
         this.renderKaomojiGrid();
     }
 
