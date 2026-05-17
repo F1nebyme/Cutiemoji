@@ -666,11 +666,16 @@ class KaomojiApp {
             kaomojis = getKaomojiByCategory(this.currentCategory);
         }
 
+                // 获取系统标签的原始颜文字（用于区分用户添加的）
+        const systemItems = this.getSystemItems(this.currentCategory);
+
         kaomojis.forEach(k => {
             const card = document.createElement('div');
             card.className = 'kaomoji-card';
 
-            const canDelete = this.currentCategory === 'favorites' || this.currentCategory.startsWith('custom_');
+            // 自定义标签、或用户添加到系统标签的颜文字可以删除，收藏不显示删除
+            const isUserAdded = !this.currentCategory.startsWith('custom_') && !systemItems.includes(k.text);
+            const canDelete = this.currentCategory.startsWith('custom_') || isUserAdded;
 
             card.innerHTML = `
                 <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${k.text}</div>
@@ -772,6 +777,19 @@ class KaomojiApp {
         this.renderKaomojiGrid();
     }
 
+    getSystemItems(category) {
+        if (!this._systemItems) {
+            this._systemItems = {};
+        }
+        if (!this._systemItems[category]) {
+            const imported = JSON.parse(localStorage.getItem('kaomoji-imported-data') || '{}');
+            const importedItems = imported[category] || [];
+            const allItems = kaomojiData[category] ? kaomojiData[category].items : [];
+            this._systemItems[category] = allItems.filter(item => !importedItems.includes(item));
+        }
+        return this._systemItems[category];
+    }
+
     deleteKaomoji(text) {
         if (this.currentCategory === 'favorites') {
             this.favorites = this.favorites.filter(f => f !== text);
@@ -780,6 +798,11 @@ class KaomojiApp {
         } else if (this.currentCategory.startsWith('custom_') && kaomojiData[this.currentCategory]) {
             kaomojiData[this.currentCategory].items = kaomojiData[this.currentCategory].items.filter(item => item !== text);
             this.saveCustomCategories();
+            this.showToast('已删除');
+        } else if (kaomojiData[this.currentCategory]) {
+            // 用户添加到系统标签的颜文字
+            kaomojiData[this.currentCategory].items = kaomojiData[this.currentCategory].items.filter(item => item !== text);
+            saveImportedKaomoji(this.currentCategory);
             this.showToast('已删除');
         }
         this.renderKaomojiGrid();
