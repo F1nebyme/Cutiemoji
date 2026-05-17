@@ -786,6 +786,11 @@ class KaomojiApp {
             kaomojiData[this.currentCategory].items = kaomojiData[this.currentCategory].items.filter(item => item !== text);
             this.saveCustomCategories();
             this.showToast('已删除');
+        } else if (kaomojiData[this.currentCategory]) {
+            // 用户添加到系统标签的颜文字
+            kaomojiData[this.currentCategory].items = kaomojiData[this.currentCategory].items.filter(item => item !== text);
+            saveImportedKaomoji(this.currentCategory);
+            this.showToast('已删除');
         }
         this.renderKaomojiGrid();
     }
