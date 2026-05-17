@@ -256,7 +256,7 @@ class KaomojiApp {
                 });
             }
 
-            // 拖拽排序
+                        // 拖拽排序（桌面端）
             item.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData('text/plain', index);
                 item.classList.add('dragging');
@@ -280,6 +280,88 @@ class KaomojiApp {
                     this.renderGroupList();
                 }
             });
+
+            // 触摸拖拽排序（手机端）
+            let touchDragItem = null;
+            let touchDragIndex = -1;
+            let touchClone = null;
+            let touchStartY = 0;
+            let touchCurrentItem = null;
+
+            item.addEventListener('touchstart', (e) => {
+                const handle = item.querySelector('.group-item-handle');
+                if (!handle || !e.target.closest('.group-item-handle')) return;
+
+                touchDragItem = item;
+                touchDragIndex = index;
+                touchStartY = e.touches[0].clientY;
+
+                // 创建拖拽副本
+                touchClone = item.cloneNode(true);
+                touchClone.style.position = 'fixed';
+                touchClone.style.zIndex = '9999';
+                touchClone.style.width = item.offsetWidth + 'px';
+                touchClone.style.opacity = '0.8';
+                touchClone.style.pointerEvents = 'none';
+                touchClone.style.backgroundColor = 'var(--primary)';
+                touchClone.style.color = 'white';
+                touchClone.style.borderRadius = '10px';
+                touchClone.style.boxShadow = '0 4px 15px rgba(0,0,0,0.3)';
+                const rect = item.getBoundingClientRect();
+                touchClone.style.left = rect.left + 'px';
+                touchClone.style.top = rect.top + 'px';
+                document.body.appendChild(touchClone);
+
+                item.style.opacity = '0.3';
+                e.preventDefault();
+            }, { passive: false });
+
+            item.addEventListener('touchmove', (e) => {
+                if (!touchDragItem || !touchClone) return;
+                e.preventDefault();
+
+                const touch = e.touches[0];
+                const rect = touchDragItem.getBoundingClientRect();
+                touchClone.style.top = (touch.clientY - rect.height / 2) + 'px';
+
+                // 找到当前悬停的元素
+                touchClone.style.display = 'none';
+                const elem = document.elementFromPoint(touch.clientX, touch.clientY);
+                touchClone.style.display = '';
+
+                if (elem) {
+                    const groupItem = elem.closest('.group-item');
+                    if (groupItem && groupItem !== touchDragItem) {
+                        if (touchCurrentItem) touchCurrentItem.style.borderTop = '';
+                        touchCurrentItem = groupItem;
+                        touchCurrentItem.style.borderTop = '3px solid var(--primary)';
+                    }
+                }
+            }, { passive: false });
+
+            item.addEventListener('touchend', (e) => {
+                if (!touchDragItem) return;
+
+                if (touchClone) {
+                    touchClone.remove();
+                    touchClone = null;
+                }
+
+                touchDragItem.style.opacity = '';
+
+                if (touchCurrentItem && touchCurrentItem !== touchDragItem) {
+                    const toIndex = parseInt(touchCurrentItem.dataset.index);
+                    if (touchDragIndex !== toIndex) {
+                        this.reorderCategory(touchDragIndex, toIndex);
+                        this.renderGroupList();
+                    }
+                }
+
+                if (touchCurrentItem) touchCurrentItem.style.borderTop = '';
+                touchDragItem = null;
+                touchDragIndex = -1;
+                touchCurrentItem = null;
+            }, { passive: true });
 
             list.appendChild(item);
         });
