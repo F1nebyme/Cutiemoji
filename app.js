@@ -666,11 +666,16 @@ class KaomojiApp {
             kaomojis = getKaomojiByCategory(this.currentCategory);
         }
 
+                // 获取系统标签的原始颜文字（用于区分用户添加的）
+        const systemItems = this.getSystemItems(this.currentCategory);
+
         kaomojis.forEach(k => {
             const card = document.createElement('div');
             card.className = 'kaomoji-card';
 
-            const canDelete = this.currentCategory === 'favorites' || this.currentCategory.startsWith('custom_');
+            // 自定义标签、或用户添加到系统标签的颜文字可以删除，收藏不显示删除
+            const isUserAdded = !this.currentCategory.startsWith('custom_') && !systemItems.includes(k.text);
+            const canDelete = this.currentCategory.startsWith('custom_') || isUserAdded;
 
             card.innerHTML = `
                 <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${k.text}</div>
