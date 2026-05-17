@@ -151,14 +151,15 @@ class KaomojiApp {
         favOption.textContent = '我的收藏';
         select.appendChild(favOption);
 
-        // 动态从 kaomojiData 读取所有标签
+        // 动态从 kaomojiData 读取所有标签（排除内置的 custom，保留用户创建的 custom_xxx）
         for (const key in kaomojiData) {
-            const option = document.createElement('option');
-            option.value = key;
-            option.textContent = kaomojiData[key].name;
-            select.appendChild(option);
+            if (key !== 'custom') {
+                const option = document.createElement('option');
+                option.value = key;
+                option.textContent = kaomojiData[key].name;
+                select.appendChild(option);
+            }
         }
-    }
 
     createNewCategory(name) {
         const id = 'custom_' + Date.now();
