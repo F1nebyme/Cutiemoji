@@ -674,22 +674,22 @@ class KaomojiApp {
             card.className = 'kaomoji-card';
 
             // 自定义标签、或用户添加到系统标签的颜文字可以删除，收藏不显示删除
-            const isUserAdded = !this.currentCategory.startsWith('custom_') && !systemItems.includes(k.text);
+                        const isUserAdded = !this.currentCategory.startsWith('custom_') && !systemItems.includes(k.text);
             const canDelete = this.currentCategory.startsWith('custom_') || isUserAdded;
+            const isFavorites = this.currentCategory === 'favorites';
+
+            // 构建按钮：收藏必显示，删除只在可删除时显示
+            let buttonsHtml = `<button class="action-btn favorite-btn ${this.isFavorited(k.text) ? 'favorited' : ''}" title="收藏">⭐</button>`;
+            if (canDelete) {
+                buttonsHtml += `<button class="action-btn delete-kaomoji-btn" title="删除">🗑️</button>`;
+            }
 
             card.innerHTML = `
                 <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${k.text}</div>
-                <div class="kaomoji-actions">
-                    <button class="action-btn copy-btn" title="复制">📋</button>
-                    <button class="action-btn favorite-btn ${this.isFavorited(k.text) ? 'favorited' : ''}" title="收藏">⭐</button>
-                    ${canDelete ? '<button class="action-btn delete-kaomoji-btn" title="删除">🗑️</button>' : ''}
+                <div class="kaomoji-actions ${!canDelete ? 'single-btn' : ''}">
+                    ${buttonsHtml}
                 </div>
             `;
-
-            card.querySelector('.copy-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                this.copyToClipboard(k.text);
-            });
 
             card.querySelector('.favorite-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
