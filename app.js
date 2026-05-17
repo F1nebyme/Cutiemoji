@@ -24,9 +24,10 @@ class KaomojiApp {
         this.init();
     }
 
-    init() {
+        init() {
         this.loadCategoryOrder();
         this.loadCustomCategories();
+        this.updateCategorySelect();
         this.bindEvents();
         this.renderKaomojiGrid();
         this.initKaomojiSelector();
@@ -103,7 +104,7 @@ class KaomojiApp {
         localStorage.setItem('kaomoji-category-order', JSON.stringify(order));
     }
 
-    loadCategoryOrder() {
+        loadCategoryOrder() {
         const saved = localStorage.getItem('kaomoji-category-order');
         if (!saved) return;
 
@@ -112,11 +113,27 @@ class KaomojiApp {
             const tabs = document.querySelector('.category-tabs');
             if (!tabs) return;
 
+            const allBtns = [...tabs.querySelectorAll('.cat-btn')];
+            const orderedBtns = [];
+
+            // 先按保存的顺序添加
             order.forEach(category => {
-                const btn = tabs.querySelector(`[data-category="${category}"]`);
+                const btn = allBtns.find(b => b.dataset.category === category);
                 if (btn) {
-                    tabs.appendChild(btn);
+                    orderedBtns.push(btn);
                 }
+            });
+
+            // 再把不在 order 中的新标签追加到末尾
+            allBtns.forEach(btn => {
+                if (!order.includes(btn.dataset.category)) {
+                    orderedBtns.push(btn);
+                }
+            });
+
+            // 按顺序重新插入
+            orderedBtns.forEach(btn => {
+                tabs.appendChild(btn);
             });
         } catch (e) {
             console.error('加载分类顺序失败', e);
