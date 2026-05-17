@@ -103,7 +103,7 @@ class KaomojiApp {
         localStorage.setItem('kaomoji-category-order', JSON.stringify(order));
     }
 
-        loadCategoryOrder() {
+    loadCategoryOrder() {
         const saved = localStorage.getItem('kaomoji-category-order');
         if (!saved) return;
 
