@@ -778,16 +778,12 @@ class KaomojiApp {
     }
 
     getSystemItems(category) {
-        if (!this._systemItems) {
-            this._systemItems = {};
-        }
-        if (!this._systemItems[category]) {
-            const imported = JSON.parse(localStorage.getItem('kaomoji-imported-data') || '{}');
-            const importedItems = imported[category] || [];
-            const allItems = kaomojiData[category] ? kaomojiData[category].items : [];
-            this._systemItems[category] = allItems.filter(item => !importedItems.includes(item));
-        }
-        return this._systemItems[category];
+    // 每次重新计算，不使用缓存
+    const imported = JSON.parse(localStorage.getItem('kaomoji-imported-data') || '{}');
+    const importedItems = imported[category] || [];
+    const allItems = kaomojiData[category] ? [...kaomojiData[category].items] : [];
+    // 系统原有颜文字 = 所有颜文字 - 用户导入的颜文字
+    return allItems.filter(item => !importedItems.includes(item));
     }
 
     deleteKaomoji(text) {
