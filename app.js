@@ -1329,8 +1329,12 @@ class KaomojiApp {
         const localX = dx * cos - dy * sin;
         const localY = dx * sin + dy * cos;
 
-        return localX >= -width * sx / 2 && localX <= width * sx / 2 &&
-               localY >= -height * sy / 2 && localY <= height * sy / 2;
+         // 动态触摸缓冲区：小元素给更多缓冲，大元素给较少缓冲
+        // 最小 8px，最大 20px，根据元素大小动态调整
+        const elementSize = Math.max(width * sx, height * sy);
+        const touchPadding = Math.min(20, Math.max(8, 80 / elementSize * 10)) / Math.max(sx, sy);
+        return localX >= -width * sx / 2 - touchPadding && localX <= width * sx / 2 + touchPadding &&
+               localY >= -height * sy / 2 - touchPadding && localY <= height * sy / 2 + touchPadding;
     }
 
     drawElement(el) {
@@ -1427,12 +1431,15 @@ class KaomojiApp {
             ? '"Segoe UI", "PingFang SC", sans-serif'
             : `"${fontFamily}", sans-serif`;
 
+                // 根据 canvas 尺寸计算合适的初始字体大小
+        const baseFontSize = Math.max(48, Math.min(this.canvas.width, this.canvas.height) * 0.08);
+        
         this.elements.push({
             type: 'text',
             text: text,
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
-            fontSize: 32,
+            fontSize: baseFontSize,
             color: color,
             fontFamily: fontFamilyCSS,
             fontWeight: '400',
@@ -1471,17 +1478,20 @@ class KaomojiApp {
         if (!text) return;
         const color = document.getElementById('kaomoji-text-color').value;
 
+               // 根据 canvas 尺寸计算合适的初始字体大小
+        const baseFontSize = Math.max(48, Math.min(this.canvas.width, this.canvas.height) * 0.08);
+        
         this.elements.push({
             type: 'kaomoji',
             text: text,
             x: this.canvas.width / 2,
             y: this.canvas.height / 2,
-            fontSize: 32,
+            fontSize: baseFontSize,
             color: color,
             fontWeight: '400',
             scale: 1,
             rotation: 0
-        });
+        }); 
 
         this.drawCanvas();
         document.getElementById('kaomoji-modal').classList.add('hidden');
@@ -1671,7 +1681,7 @@ class KaomojiApp {
         reader.readAsDataURL(file);
     }
 
-    startPipCrop() {
+        startPipCrop() {
         if (!this.pipImage) return;
         this.showToast('请在画布上拖拽选择裁剪区域');
         const canvas = document.getElementById('pip-canvas');
@@ -1682,26 +1692,17 @@ class KaomojiApp {
 
         let startX, startY, isDrawing = false;
 
-        const getPos = (e) => {
+        const getPos = (clientX, clientY) => {
             const rect = canvas.getBoundingClientRect();
             const scaleX = canvas.width / rect.width;
             const scaleY = canvas.height / rect.height;
             return {
-                x: (e.clientX - rect.left) * scaleX,
-                y: (e.clientY - rect.top) * scaleY
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
             };
         };
 
-        const onMouseDown = (e) => {
-            const pos = getPos(e);
-            startX = pos.x;
-            startY = pos.y;
-            isDrawing = true;
-        };
-
-        const onMouseMove = (e) => {
-            if (!isDrawing) return;
-            const pos = getPos(e);
+        const drawCrop = (pos) => {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.drawImage(this.pipImage, 0, 0);
             ctx.fillStyle = 'rgba(0,0,0,0.4)';
@@ -1715,10 +1716,9 @@ class KaomojiApp {
             ctx.setLineDash([]);
         };
 
-        const onMouseUp = (e) => {
+        const finishCrop = (pos) => {
             if (!isDrawing) return;
             isDrawing = false;
-            const pos = getPos(e);
             const x = Math.min(startX, pos.x);
             const y = Math.min(startY, pos.y);
             const w = Math.abs(pos.x - startX);
@@ -1732,11 +1732,57 @@ class KaomojiApp {
             canvas.removeEventListener('mousedown', onMouseDown);
             canvas.removeEventListener('mousemove', onMouseMove);
             canvas.removeEventListener('mouseup', onMouseUp);
+            canvas.removeEventListener('touchstart', onTouchStart, { passive: false });
+            canvas.removeEventListener('touchmove', onTouchMove, { passive: false });
+            canvas.removeEventListener('touchend', onTouchEnd);
+        };
+
+        // 鼠标事件（桌面端）
+        const onMouseDown = (e) => {
+            const pos = getPos(e.clientX, e.clientY);
+            startX = pos.x;
+            startY = pos.y;
+            isDrawing = true;
+        };
+
+        const onMouseMove = (e) => {
+            if (!isDrawing) return;
+            drawCrop(getPos(e.clientX, e.clientY));
+        };
+
+        const onMouseUp = (e) => {
+            finishCrop(getPos(e.clientX, e.clientY));
+        };
+
+        // 触摸事件（手机端）
+        const onTouchStart = (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const pos = getPos(touch.clientX, touch.clientY);
+            startX = pos.x;
+            startY = pos.y;
+            isDrawing = true;
+        };
+
+        const onTouchMove = (e) => {
+            e.preventDefault();
+            if (!isDrawing) return;
+            const touch = e.touches[0];
+            drawCrop(getPos(touch.clientX, touch.clientY));
+        };
+
+        const onTouchEnd = (e) => {
+            if (!isDrawing) return;
+            const touch = e.changedTouches[0];
+            finishCrop(getPos(touch.clientX, touch.clientY));
         };
 
         canvas.addEventListener('mousedown', onMouseDown);
         canvas.addEventListener('mousemove', onMouseMove);
         canvas.addEventListener('mouseup', onMouseUp);
+        canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+        canvas.addEventListener('touchmove', onTouchMove, { passive: false });
+        canvas.addEventListener('touchend', onTouchEnd);
     }
 
     confirmPip() {
