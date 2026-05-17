@@ -145,12 +145,6 @@ class KaomojiApp {
 
         select.innerHTML = '';
 
-        // 先添加"我的收藏"（不在 kaomojiData 中）
-        const favOption = document.createElement('option');
-        favOption.value = 'favorites';
-        favOption.textContent = '我的收藏';
-        select.appendChild(favOption);
-
         // 动态从 kaomojiData 读取所有标签（排除内置的 custom，保留用户创建的 custom_xxx）
         for (const key in kaomojiData) {
             if (key !== 'custom') {
