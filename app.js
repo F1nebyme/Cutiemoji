@@ -758,7 +758,11 @@ card.innerHTML = `
             this.showToast('已复制到剪贴板！');
         }
     }
-
+    escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+    }
     showToast(message) {
         const toast = document.getElementById('toast');
         toast.textContent = message;
