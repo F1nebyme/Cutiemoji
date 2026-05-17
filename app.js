@@ -65,16 +65,33 @@ class KaomojiApp {
             tabs.scrollLeft = scrollLeft - walk;
         });
 
-        // 触摸支持
+            // 触摸支持 - 优化滑动体验
+        let touchStartX = 0;
+        let touchScrollLeft = 0;
+        let isTouching = false;
+
         tabs.addEventListener('touchstart', (e) => {
-            startX = e.touches[0].pageX - tabs.offsetLeft;
-            scrollLeft = tabs.scrollLeft;
+            isTouching = true;
+            touchStartX = e.touches[0].pageX;
+            touchScrollLeft = tabs.scrollLeft;
+            tabs.style.scrollBehavior = 'auto';
         }, { passive: true });
 
         tabs.addEventListener('touchmove', (e) => {
-            const x = e.touches[0].pageX - tabs.offsetLeft;
-            const walk = (x - startX) * 2;
-            tabs.scrollLeft = scrollLeft - walk;
+            if (!isTouching) return;
+            const touchX = e.touches[0].pageX;
+            const walk = touchStartX - touchX;
+            tabs.scrollLeft = touchScrollLeft + walk;
+        }, { passive: true });
+
+        tabs.addEventListener('touchend', () => {
+            isTouching = false;
+            tabs.style.scrollBehavior = 'smooth';
+        }, { passive: true });
+
+        tabs.addEventListener('touchcancel', () => {
+            isTouching = false;
+            tabs.style.scrollBehavior = 'smooth';
         }, { passive: true });
     }
 
