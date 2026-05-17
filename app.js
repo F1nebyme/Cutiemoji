@@ -1622,7 +1622,7 @@ class KaomojiApp {
                 const file = new File([blob], filename, { type: 'image/png' });
 
         if (navigator.canShare({ files: [file] })) {
-                    this.showToast('请在弹出的菜单中选择保存方式');
+                    // this.showToast('请在弹出的菜单中选择保存方式');
                     await navigator.share({
                         files: [file],
                         title: '保存图片',
