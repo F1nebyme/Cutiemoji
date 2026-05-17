@@ -1600,7 +1600,7 @@ class KaomojiApp {
         this.showToast('已复制元素');
     }
 
-    downloadImage() {
+        async downloadImage() {
         if (!this.canvas) {
             this.showToast('请先上传图片！');
             return;
@@ -1610,15 +1610,49 @@ class KaomojiApp {
         this.selectElement(null);
         this.drawCanvas();
 
-        const link = document.createElement('a');
-        link.download = `kaomoji-edit-${Date.now()}.png`;
-        link.href = this.canvas.toDataURL('image/png');
-        link.click();
+        const dataUrl = this.canvas.toDataURL('image/png');
+        const filename = `kaomoji-edit-${Date.now()}.png`;
+
+        // 尝试使用 Web Share API（手机端）
+        if (navigator.share && navigator.canShare) {
+            try {
+                // 将 dataURL 转换为 Blob
+                const response = await fetch(dataUrl);
+                const blob = await response.blob();
+                const file = new File([blob], filename, { type: 'image/png' });
+
+                if (navigator.canShare({ files: [file] })) {
+                    await navigator.share({
+                        files: [file],
+                        title: '保存图片',
+                        text: '选择"保存图片"保存到相册'
+                    });
+                    this.showToast('请选择"保存图片"');
+                } else {
+                    // 不支持分享文件，回退到下载
+                    this.fallbackDownload(dataUrl, filename);
+                }
+            } catch (err) {
+                // 用户取消分享或出错，回退到下载
+                if (err.name !== 'AbortError') {
+                    this.fallbackDownload(dataUrl, filename);
+                }
+            }
+        } else {
+            // 不支持 Web Share API，使用传统下载
+            this.fallbackDownload(dataUrl, filename);
+        }
 
         this.selectElement(selected);
         this.drawCanvas();
+    }
 
-        this.showToast('图片已保存！');
+    fallbackDownload(dataUrl, filename) {
+        const link = document.createElement('a');
+        link.download = filename;
+        link.href = dataUrl;
+        link.click();
+        this.showToast('图片已下载！');
     }
 
     changeImage() {
