@@ -216,6 +216,8 @@ nav {
     -ms-overflow-style: none;
     padding-bottom: 5px;
     justify-content: flex-start;
+    touch-action: pan-x;
+    -webkit-user-drag: none;
 }
 
 .category-tabs::-webkit-scrollbar {
