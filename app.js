@@ -777,6 +777,19 @@ class KaomojiApp {
         this.renderKaomojiGrid();
     }
 
+    getSystemItems(category) {
+        if (!this._systemItems) {
+            this._systemItems = {};
+        }
+        if (!this._systemItems[category]) {
+            const imported = JSON.parse(localStorage.getItem('kaomoji-imported-data') || '{}');
+            const importedItems = imported[category] || [];
+            const allItems = kaomojiData[category] ? kaomojiData[category].items : [];
+            this._systemItems[category] = allItems.filter(item => !importedItems.includes(item));
+        }
+        return this._systemItems[category];
+    }
+
     deleteKaomoji(text) {
         if (this.currentCategory === 'favorites') {
             this.favorites = this.favorites.filter(f => f !== text);
