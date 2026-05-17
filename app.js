@@ -1627,7 +1627,7 @@ class KaomojiApp {
                         title: '保存图片',
                         text: '选择"保存图片"保存到相册'
                     });
-                    this.showToast('请选择"保存图片"');
+                    this.showToast('分享菜单已打开，请选择保存方式');
                 } else {
                     // 不支持分享文件，回退到下载
                     this.fallbackDownload(dataUrl, filename);
@@ -1653,7 +1653,7 @@ class KaomojiApp {
         link.href = dataUrl;
         link.click();
         this.showToast('图片已下载！');
-    }
+    } 
 
     changeImage() {
         // 触发文件选择框
