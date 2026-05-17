@@ -666,30 +666,37 @@ class KaomojiApp {
             kaomojis = getKaomojiByCategory(this.currentCategory);
         }
 
-                // 获取系统标签的原始颜文字（用于区分用户添加的）
-        const systemItems = this.getSystemItems(this.currentCategory);
+            // 获取系统原有颜文字（不含用户添加的）
+const systemOriginalItems = this.getSystemItems(this.currentCategory);
 
-        kaomojis.forEach(k => {
-            const card = document.createElement('div');
-            card.className = 'kaomoji-card';
+// 判断是否可删除：
+// 1. 自定义分类（custom_ 开头）：全部可删除
+// 2. 系统分类（非 custom_、非 favorites）：只有用户添加的（不在系统原始列表中）才可删除
+// 3. 收藏夹：不显示删除按钮
+let canDelete = false;
 
-            // 自定义标签、或用户添加到系统标签的颜文字可以删除，收藏不显示删除
-                        const isUserAdded = !this.currentCategory.startsWith('custom_') && !systemItems.includes(k.text);
-            const canDelete = this.currentCategory.startsWith('custom_') || isUserAdded;
-            const isFavorites = this.currentCategory === 'favorites';
+if (this.currentCategory.startsWith('custom_')) {
+    canDelete = true;  // 自定义分类全部可删除
+} else if (this.currentCategory !== 'favorites') {
+    // 系统分类：只有用户添加的才能删除
+    canDelete = !systemOriginalItems.includes(k.text);
+}
+// 收藏夹不显示删除按钮（通过取消收藏来移除）
 
-            // 构建按钮：收藏必显示，删除只在可删除时显示
-            let buttonsHtml = `<button class="action-btn favorite-btn ${this.isFavorited(k.text) ? 'favorited' : ''}" title="收藏">⭐</button>`;
-            if (canDelete) {
-                buttonsHtml += `<button class="action-btn delete-kaomoji-btn" title="删除">🗑️</button>`;
-            }
+// 构建按钮
+let buttonsHtml = `<button class="action-btn favorite-btn ${this.isFavorited(k.text) ? 'favorited' : ''}" title="收藏">⭐</button>`;
+if (canDelete) {
+    buttonsHtml += `<button class="action-btn delete-kaomoji-btn" title="删除">🗑️</button>`;
+}
 
-            card.innerHTML = `
-                <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${k.text}</div>
-                <div class="kaomoji-actions ${!canDelete ? 'single-btn' : ''}">
-                    ${buttonsHtml}
-                </div>
-            `;
+const singleBtnClass = !canDelete ? 'single-btn' : '';
+
+card.innerHTML = `
+    <div class="kaomoji-text" style="color: ${this.kaomojiColor}">${this.escapeHtml(k.text)}</div>
+    <div class="kaomoji-actions ${singleBtnClass}">
+        ${buttonsHtml}
+    </div>
+`; 
 
             card.querySelector('.favorite-btn').addEventListener('click', (e) => {
                 e.stopPropagation();
