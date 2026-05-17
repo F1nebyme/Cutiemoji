@@ -1621,14 +1621,14 @@ class KaomojiApp {
                 const blob = await response.blob();
                 const file = new File([blob], filename, { type: 'image/png' });
 
-                if (navigator.canShare({ files: [file] })) {
+        if (navigator.canShare({ files: [file] })) {
+                    this.showToast('请在弹出的菜单中选择保存方式');
                     await navigator.share({
                         files: [file],
                         title: '保存图片',
                         text: '选择"保存图片"保存到相册'
                     });
-                    this.showToast('分享菜单已打开，请选择保存方式');
-                } else {
+                }else {
                     // 不支持分享文件，回退到下载
                     this.fallbackDownload(dataUrl, filename);
                 }
