@@ -123,7 +123,7 @@ class KaomojiApp {
         }
     }
 
-    updateCategorySelect() {
+        updateCategorySelect() {
         const select = document.getElementById('manual-category-select');
         if (!select) return;
 
@@ -135,7 +135,7 @@ class KaomojiApp {
         favOption.textContent = '我的收藏';
         select.appendChild(favOption);
 
-        // 动态从 kaomojiData 读取所有系统标签（排除 custom 和 favorites）
+        // 动态从 kaomojiData 读取所有系统标签（排除 custom）
         for (const key in kaomojiData) {
             if (key !== 'custom' && !key.startsWith('custom_')) {
                 const option = document.createElement('option');
