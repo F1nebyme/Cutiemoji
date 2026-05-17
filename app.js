@@ -25,9 +25,8 @@ class KaomojiApp {
     }
 
         init() {
-        this.loadCategoryOrder();
         this.loadCustomCategories();
-        this.updateCategorySelect();
+        this.loadCategoryOrder();
         this.bindEvents();
         this.renderKaomojiGrid();
         this.initKaomojiSelector();
