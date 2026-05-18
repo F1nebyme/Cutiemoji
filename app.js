@@ -1931,6 +1931,10 @@ class KaomojiApp {
         if (addCustomKaomoji(text, category)) {
             this.showToast(`已添加到「${kaomojiData[category].name}」分类！`);
             input.value = '';
+            // 如果是自定义标签，需要额外保存
+            if (category.startsWith('custom_')) {
+                this.saveCustomCategories();
+            }
             this.renderKaomojiGrid();
         } else {
             this.showToast('该颜文字已存在！');
