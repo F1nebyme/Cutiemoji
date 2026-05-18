@@ -974,11 +974,6 @@ nav {
     display: flex;
     justify-content: center;
     gap: 10px;
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.kaomoji-card:hover .kaomoji-actions {
     opacity: 1;
 }
 
